@@ -6,7 +6,9 @@ TkDrawer.create
   puts '============================================================='
   puts "Начало работы с полиэдром '#{name}'"
   start_time = Time.now
-  Polyedr.new("../data/#{name}.geom").draw
+  p = Polyedr.new("../data/#{name}.geom")
+  p.draw
+  puts p.calculate_something()
   puts "Изображение полиэдра '#{name}' заняло #{Time.now - start_time} сек."
   print 'Hit "Return" to continue -> '
   gets

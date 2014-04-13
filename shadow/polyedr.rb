@@ -54,6 +54,10 @@ class Edge
     @beg*(SFIN-t) + @fin*t
   end
 
+  def is_good?() #подходит ли нам эта грань (добавлено)
+    @gaps.size != 0 and self.is_center_good?()
+  end
+
   private
   # пересечение ребра с полупространством, задаваемым точкой (a)
   # на плоскости и вектором внешней нормали (n) к ней
@@ -98,6 +102,17 @@ end
 class Polyedr 
   # вектор проектирования
   V = R3.new(0.0,0.0,1.0)
+
+  def calculate_something() #здесь надо немного волшебства (добавлено)
+    result = 0
+    edges.each do |e|
+      facets.each do |f|
+		e.shadow(f)
+	  end
+      result += Math.sqrt((e.beg.x - e.fin.x)**2 + (e.beg.y - e.fin.y)**2)
+    end
+    result
+  end
 
   def draw
     TkDrawer.clean
