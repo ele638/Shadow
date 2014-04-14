@@ -34,10 +34,6 @@ class R3
   def cross(other)
     R3.new(@y*other.z-@z*other.y, @z*other.x-@x*other.z, @x*other.y-@y*other.x)
   end
-  # угол наклона вектора к плоскости Oxy (добавлено)
-  def angle_with_xy
-	atan(@z/sqrt(@x**2+@y**2))<=::PI/7
-  end
 end
 
 # Ребро полиэдра
@@ -47,13 +43,6 @@ class Edge
   def initialize(b, f)
     @beg, @fin = b, f
   end  
-
-  def is_center_good?() #лежит ли в сфере
-    xc = (@beg.x + @fin.x) / 2.0
-	yc = (@beg.y + @fin.y) / 2.0 
-	zc = (@beg.z + @fin.z) / 2.0
-    return ((xc**2+yc**2+zc**2)<4)
-  end
 end
 
 # Грань полиэдра
