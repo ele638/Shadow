@@ -34,6 +34,14 @@ class R3
   def cross(other)
     R3.new(@y*other.z-@z*other.y, @z*other.x-@x*other.z, @x*other.y-@y*other.x)
   end
+  def R3.pyramid(verh, high, side)
+	centergip=R3.new(verh.x,verh.y,verh.z-high)
+	lenthgip=side*sqrt(2)
+	a=R3.new(centergip.x-lenthgip/2,centergip.y,centergip.z)
+	b=R3.new(centergip.x+lenthgip/2,centergip.y,centergip.z)
+	c=R3.new(centergip.x,centergip.y+lenthgip/2,centergip.z)
+	
+  end
 end
 
 # Ребро полиэдра
@@ -59,6 +67,8 @@ class Polyedr
   # Массивы рёбер и граней
   attr_reader :edges, :facets
   def initialize(file)
+	#output=File.new("output.geom", "w+")
+	
     # файл, задающий полиэдр
     File.open(file, 'r') do |f|
       # вспомогательный массив
@@ -67,6 +77,8 @@ class Polyedr
       c = buf.shift.to_f
       #  углы Эйлера, определяющие вращение
       alpha, beta, gamma = buf.map{|x| x.to_f*PI/180.0}
+	  #output.puts "#{c} #{alpha} #{beta} #{gamma}"
+	  
       # количество вершин, граней и рёбер полиэдра
       nv, nf, ne  = f.readline.split.map(&:to_i)
       @vertexes, @edges, @facets = [], [], []
@@ -90,3 +102,6 @@ class Polyedr
     end
   end
 end
+
+a=R3.new(2,1,4)
+p R3.pyramid(a, 4, 3)
