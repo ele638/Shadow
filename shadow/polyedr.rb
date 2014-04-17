@@ -98,7 +98,6 @@ end
 class Polyedr 
   # вектор проектирования
   V = R3.new(0.0,0.0,1.0)
-
   def draw
     TkDrawer.clean
     edges.each do |e|
