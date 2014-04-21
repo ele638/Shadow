@@ -34,6 +34,7 @@ class R3
   def cross(other)
     R3.new(@y*other.z-@z*other.y, @z*other.x-@x*other.z, @x*other.y-@y*other.x)
   end
+
   # угол наклона вектора к плоскости Oxy (добавлено)
   def angle_with_xy
 	atan(@z/sqrt(@x**2+@y**2))<=::PI/7
@@ -97,5 +98,4 @@ class Polyedr
       end
     end
   end
-  
 end

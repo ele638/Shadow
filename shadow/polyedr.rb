@@ -53,19 +53,16 @@ class Edge
   def r3(t)
     @beg*(SFIN-t) + @fin*t
   end
-
   def is_good?() #подходит ли нам это ребро (добавлено)
     sum = @gaps.inject{|sum,x| sum+x.fin-x.beg}
     sum > 0.000001 && sum < 0.999999
   end
-  
   def is_center_good?() #лежит ли в сфере (добавлено)
     xc = (@beg.x + @fin.x) / 2.0
 	  yc = (@beg.y + @fin.y) / 2.0 
 	  zc = (@beg.z + @fin.z) / 2.0
     return ((xc**2+yc**2+zc**2)<4)
   end
-
   private
   # пересечение ребра с полупространством, задаваемым точкой (a)
   # на плоскости и вектором внешней нормали (n) к ней
@@ -110,7 +107,6 @@ end
 class Polyedr 
   # вектор проектирования
   V = R3.new(0.0,0.0,1.0)
-
   def calculate_something() #считаем сумму проекций (добавлено)
     result = 0
     edges.each do |e|
