@@ -53,6 +53,10 @@ class Edge
   def r3(t)
     @beg*(SFIN-t) + @fin*t
   end
+  
+  def is_center_visible?
+    @gaps.any?{|gap| gap.beg<=0.5 && gap.beg>=0.5}
+  end
 
   private
   # пересечение ребра с полупространством, задаваемым точкой (a)
@@ -103,6 +107,10 @@ class Polyedr
     TkDrawer.clean
     edges.each do |e|
       facets.each{|f| e.shadow(f)}
+      if e.is_center_visible?
+        puts "#{e.beg.x} + #{e.beg.y} + #{e.beg.z}"
+        puts "#{e.fin.x} + #{e.fin.y} + #{e.fin.z}"
+      end
       e.gaps.each{|s| TkDrawer.draw_line(e.r3(s.beg), e.r3(s.fin))}
     end
   end
