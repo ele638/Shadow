@@ -86,7 +86,16 @@ class Facet
       n.dot(@vertexes[k-1] - center) < 0.0 ? n*(-1.0) : n
     end
   end
+  
+  def is_not_full_visible?
+     summ = @gaps.inject(0){|summ,s| summ+s.fin-s.beg}
+     summ > 0 && sum < 0.999999 
+  end
 
+  def cetner
+     R3(0.5)
+  end
+  
   private
   # центр грани
   def center
@@ -103,6 +112,11 @@ class Polyedr
     TkDrawer.clean
     edges.each do |e|
       facets.each{|f| e.shadow(f)}
+      if e.is_not_full_visible?
+        puts "#{e.beg.x} + #{e.beg.y} + #{e.beg.z}"
+        puts "#{e.center.x} + #{e.center.y} + #{e.center.z}"
+        puts "#{e.fin.x} + #{e.fin.y} + #{e.fin.z}"
+      end
       e.gaps.each{|s| TkDrawer.draw_line(e.r3(s.beg), e.r3(s.fin))}
     end
   end
