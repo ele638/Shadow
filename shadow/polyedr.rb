@@ -54,8 +54,16 @@ class Edge
     @beg*(SFIN-t) + @fin*t
   end
 
-  def is_good?() #подходит ли нам эта грань (добавлено)
-    @gaps.size != 0 and self.is_center_good?()
+  def is_good?() #подходит ли нам это ребро (добавлено)
+    sum = @gaps.inject{|sum,x| sum+x.fin-x.beg}
+    sum > 0.000001 && sum < 0.999999
+  end
+  
+  def is_center_good?() #лежит ли в сфере (добавлено)
+    xc = (@beg.x + @fin.x) / 2.0
+	  yc = (@beg.y + @fin.y) / 2.0 
+	  zc = (@beg.z + @fin.z) / 2.0
+    return ((xc**2+yc**2+zc**2)<4)
   end
 
   private
@@ -103,13 +111,13 @@ class Polyedr
   # вектор проектирования
   V = R3.new(0.0,0.0,1.0)
 
-  def calculate_something() #здесь надо немного волшебства (добавлено)
+  def calculate_something() #считаем сумму проекций (добавлено)
     result = 0
     edges.each do |e|
-      facets.each do |f|
-		e.shadow(f)
-	  end
-      result += Math.sqrt((e.beg.x - e.fin.x)**2 + (e.beg.y - e.fin.y)**2)
+      facets.each{|f| e.shadow(f)}
+      last=0.0
+      e.gaps.each{|s| result+=(e.r3(last)-e.r3(s.beg)).proection; last=s.fin}
+      result+=(e.r3(last)-e.r3(1.0)).proection
     end
     result
   end
@@ -118,7 +126,10 @@ class Polyedr
     TkDrawer.clean
     edges.each do |e|
       facets.each{|f| e.shadow(f)}
-      e.gaps.each{|s| TkDrawer.draw_line(e.r3(s.beg), e.r3(s.fin))}
+      # добавлена рисовалка невидимых линий (добавлено)
+      last=0.0
+      e.gaps.each{|s| (TkDrawer.draw_line_invisible(e.r3(last), e.r3(s.beg)); last=s.fin; TkDrawer.draw_line(e.r3(s.beg), e.r3(s.fin)))}
+      TkDrawer.draw_line_invisible(e.r3(last), e.r3(1.0))
     end
   end
 end
