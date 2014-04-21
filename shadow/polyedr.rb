@@ -53,6 +53,12 @@ class Edge
   def r3(t)
     @beg*(SFIN-t) + @fin*t
   end
+  def is_visible?
+    (1-@gaps.inject(0){|summ,s| summ+s.fin-s.beg}).abs < 0.000001
+  end
+  def cetner
+    R3(0.5)
+  end
 
   private
   # пересечение ребра с полупространством, задаваемым точкой (a)
@@ -103,6 +109,11 @@ class Polyedr
     TkDrawer.clean
     edges.each do |e|
       facets.each{|f| e.shadow(f)}
+      if e.is_visible?
+        puts "#{e.beg.x} + #{e.beg.y} + #{e.beg.z}"
+        puts "#{e.center.x} + #{e.center.y} + #{e.center.z}"
+        puts "#{e.fin.x} + #{e.fin.y} + #{e.fin.z}"
+      end
       e.gaps.each{|s| TkDrawer.draw_line(e.r3(s.beg), e.r3(s.fin))}
     end
   end
