@@ -1,4 +1,4 @@
-require 'tk'
+﻿require 'tk'
 
 module TkDrawer
   # запуск интерпретатора графического интерфейса
@@ -14,9 +14,6 @@ module TkDrawer
     TkcLine.new(CANVAS, x(p), y(p), x(q), y(q)) {fill('black')}    
   end
 
-  def TkDrawer.draw_line_invisible(p,q,color='grey')
-    TkcLine.new(CANVAS, x(p), y(p), x(q), y(q)) {fill(color);dash('_')}  
-  end
   private
   # преобразование координат
   def TkDrawer.x(p)
