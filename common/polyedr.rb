@@ -1,4 +1,3 @@
-﻿#encoding: utf-8
 include Math
 
 # Вектор (точка) в R3
@@ -28,25 +27,24 @@ class R3
     R3.new(cos(fi)*@x+sin(fi)*@z, @y, -sin(fi)*@x+cos(fi)*@z)
   end
   # скалярное произведение 
-  def s(other) 
+  def dot(other) 
     @x*other.x+@y*other.y+@z*other.z
   end
   # векторное произведение
-  def v(other)
+  def cross(other)
     R3.new(@y*other.z-@z*other.y, @z*other.x-@x*other.z, @x*other.y-@y*other.x)
   end
-  # Модуль длины вектора
-  def dl
-    Math.sqrt((self.x)**2+(self.y)**2+(self.z)**2)
+  
+  def dist(other) #длина вектора (добавлено)
+	Math.sqrt( (other.x-@x)**2 + (other.y-@y)**2 + (other.z-@z)**2)
   end
-  # Угол между векторами
+  
+  def dist_proect(other) #длина проекции на плоскость Оху (добавлено)
+	Math.sqrt( (other.x-@x)**2 + (other.y-@y)**2)
+  end
+  
   def angle(other)
-    a = Math.acos((self.s(other))/(self.dl*other.dl))
-    a = a*180/Math::PI # 3.14
-  end
-  # Расстояние между двумя точками
-  def dist(other)
-  return Math.sqrt((self.x-other.x)**2 + (self.y-other.y)**2)
+	Math.acos(self.dist_proect(other)/self.dist(other))*180/Math::PI	#отношение прилежащего катета(длина проекции на плоскость Оху) к гипотенузе(длина вектора) (добавлено)
   end
 end
 
@@ -54,7 +52,7 @@ end
 class Edge 
   # начало и конец ребра (точки в R3)
   attr_reader :beg, :fin
-  def initialize(b, f, numer)
+  def initialize(b, f)
     @beg, @fin = b, f
   end  
 end
@@ -62,22 +60,21 @@ end
 # Грань полиэдра
 class Facet 
   # массив вершин
-  attr_reader :vertexes, :edges 
-  def initialize(vertexes,grans)
+  attr_reader :vertexes, :edges
+  def initialize(vertexes, edges, coef) #грань теперь задается 3я параметрами: вершины, грани ее образующие, коэффициент гомотетии(для удобства рассчетов) (обновлено)
     @vertexes = vertexes
-    @edges = grans
+	@edges = edges
+	@coef=coef
   end
-  
 end
 
 # Полиэдр
 class Polyedr 
   # Массивы рёбер и граней
-  attr_reader :facets, :sum
+  attr_reader :edges, :facets 
   def initialize(file)
-      @sum = 0
-      # файл, задающий полиэдр
-      File.open(file, 'r') do |f|
+    # файл, задающий полиэдр
+    File.open(file, 'r') do |f|
       # вспомогательный массив
       buf = f.readline.split
       # коэффициент гомотетии
@@ -85,15 +82,15 @@ class Polyedr
       #  углы Эйлера, определяющие вращение
       alpha, beta, gamma = buf.map{|x| x.to_f*PI/180.0}
       # количество вершин, граней и рёбер полиэдра
-      nv, nf, ne  = f.readline.split.map{|x| x.to_i}
+      nv, nf, ne  = f.readline.split.map(&:to_i)
       @vertexes, @edges, @facets = [], [], []
       # задание всех вершин полиэдра
       nv.times do
-        x, y, z  = f.readline.split.map{|x| x.to_f}
+        x, y, z  = f.readline.split.map(&:to_f)
         @vertexes << R3.new(x,y,z).rz(alpha).ry(beta).rz(gamma)*c
       end
       nf.times do
-        ar_grans = []
+		array_of_edges=[]
         # вспомогательный массив
         buf = f.readline.split
         # количество вершин
@@ -101,9 +98,10 @@ class Polyedr
         # массив вершин очередной грани 
         vertexes = buf.map{|x| @vertexes[x.to_i - 1]}
         # задание рёбер очередной грани
-        (0..size-1).each{|n| ar_grans << Edge.new(vertexes[n-1],vertexes[n])}
+        (0...size).each{|n| @edges << Edge.new(vertexes[n-1],vertexes[n])} #заполняем массив всех ребер
+		(0...size).each{|n| array_of_edges << Edge.new(vertexes[n-1],vertexes[n])} #заполняем массив ребер текущей грани (добавлено)
         # задание очередной грани полиэдра
-        @facets << Facet.new(vertexes,ar_grans)
+        @facets << Facet.new(vertexes, array_of_edges,c) #создаем новую грань (обновлено)
       end
     end
   end

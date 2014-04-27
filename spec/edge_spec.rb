@@ -1,27 +1,6 @@
 require 'rspec'
-require '../shadow/polyedr'
-
-EPS = 1.0e-12
-
-class R3
-  # проверка на приближённое равенство
-  def equal?(other)
-    (@x - other.x).abs < EPS and (@y - other.y).abs < EPS and
-      (@z - other.z).abs < EPS
-  end
-end
-
-class Segment
-  # проверка на приближённое равенство
-  def equal?(other)
-    (@beg - other.beg).abs < EPS and (@fin - other.fin).abs < EPS
-  end
-end
-
-class Edge
-  # метод для обеспечения вызова private метода cross
-  def c(a,n); cross(a,n) end
-end
+require_relative '../shadow/polyedr'
+require_relative 'support/matchers/to_be_close.rb'
 
 describe Edge do
 
@@ -29,57 +8,57 @@ describe Edge do
 
     it "одномерной координате 0.0 соответствует начало ребра" do
       s = Edge.new(R3.new(0.0,0.0,-1.0), R3.new(1.0,0.0,-1.0))
-      s.beg.equal?(s.r3(0.0)).should be_true
+      expect(s.beg).to be_close_to(s.r3(0.0))
     end
     
     it "одномерной координате 1.0 соответствует конец ребра" do
       s = Edge.new(R3.new(0.0,0.0,-1.0), R3.new(1.0,0.0,-1.0))
-      s.fin.equal?(s.r3(1.0)).should be_true
+      expect(s.fin).to be_close_to(s.r3(1.0))
     end
     
     it "одномерной координате 0.5 соответствует середина ребра" do
       s = Edge.new(R3.new(0.0,0.0,-1.0), R3.new(1.0,0.0,-1.0))
-      R3.new(0.5,0.0,-1.0).equal?(s.r3(0.5)).should be_true
+      expect(R3.new(0.5,0.0,-1.0)).to be_close_to(s.r3(0.5))
     end
     
   end
 
-  context "cross" do
-    # метод cross всегда возвращает одномерный отрезок!
+  context "intersect_edge_with_normal" do
+    # метод intersect_edge_with_normal всегда возвращает одномерный отрезок!
 
     it "если ребро принадлежит полупространству, то пересечение - весь отрезок" do
       s = Edge.new(R3.new(0.0,0.0,-1.0), R3.new(1.0,0.0,-1.0))
       a = R3.new(0.0,0.0,0.0)
       n = R3.new(0.0,0.0,1.0)
-      s.c(a,n).equal?(Segment.new(0.0,1.0)).should be_true
+      expect(s.send(:intersect_edge_with_normal, a,n)).to be_close_to(Segment.new(0.0,1.0))
     end
 
     it "если ребро лежит вне полупространства, то пересечение пусто" do
       s = Edge.new(R3.new(0.0,0.0,1.0), R3.new(1.0,0.0,1.0))
       a = R3.new(0.0,0.0,0.0)
       n = R3.new(0.0,0.0,1.0)
-      s.c(a,n).degenerate?.should be_true
+      expect(s.send(:intersect_edge_with_normal,a,n)).to be_degenerate
     end
 
     it "если ребро принадлежит плоскости, ограничивающей полупространство, то пересечение пусто" do
       s = Edge.new(R3.new(0.0,0.0,0.0), R3.new(1.0,0.0,0.0))
       a = R3.new(0.0,0.0,0.0)
       n = R3.new(0.0,0.0,1.0)
-      s.c(a,n).degenerate?.should be_true
+      expect(s.send(:intersect_edge_with_normal,a,n)).to be_degenerate
     end
 
     it "здесь только первая половина отрезка принадлежит полупространству" do
       s = Edge.new(R3.new(0.0,0.0,-1.0), R3.new(1.0,0.0,1.0))
       a = R3.new(1.0,1.0,0.0)
       n = R3.new(0.0,0.0,1.0)
-      s.c(a,n).equal?(Segment.new(0.0,0.5)).should be_true
+      expect(s.send(:intersect_edge_with_normal,a,n)).to be_close_to(Segment.new(0.0,0.5))
     end
 
     it "здесь только вторая половина отрезка принадлежит полупространству" do
       s = Edge.new(R3.new(0.0,0.0,1.0), R3.new(1.0,0.0,-1.0))
       a = R3.new(1.0,1.0,0.0)
       n = R3.new(0.0,0.0,1.0)
-      s.c(a,n).equal?(Segment.new(0.5,1.0)).should be_true
+      expect(s.send(:intersect_edge_with_normal,a,n)).to be_close_to(Segment.new(0.5,1.0))
     end
 
   end
@@ -91,7 +70,7 @@ describe Edge do
       f=Facet.new([R3.new(0.0,0.0,0.0),R3.new(2.0,0.0,0.0),
                    R3.new(2.0,2.0,0.0),R3.new(0.0,2.0,0.0)])
       s.shadow(f)
-      s.gaps.size.should == 1
+      expect(s.gaps.size).to be(1)
     end
 
     it "грань не затеняет ребра, расположенного выше грани" do
@@ -99,7 +78,7 @@ describe Edge do
       f=Facet.new([R3.new(0.0,0.0,0.0),R3.new(2.0,0.0,0.0),
                    R3.new(2.0,2.0,0.0),R3.new(0.0,2.0,0.0)])
       s.shadow(f)
-      s.gaps.size.should == 1
+      expect(s.gaps.size).to be(1)
     end
 
     it "грань полностью затеняет ребро, расположенное ниже грани" do
@@ -107,7 +86,7 @@ describe Edge do
       f=Facet.new([R3.new(0.0,0.0,0.0),R3.new(2.0,0.0,0.0),
                    R3.new(2.0,2.0,0.0),R3.new(0.0,2.0,0.0)])
       s.shadow(f)
-      s.gaps.size.should == 0
+      expect(s.gaps.size).to be(0)
     end
 
     it "на большом и длинном ребре, лежащем ниже грани, образуется ровно два просвета" do
@@ -115,7 +94,7 @@ describe Edge do
       f=Facet.new([R3.new(0.0,0.0,0.0),R3.new(2.0,0.0,0.0),
                    R3.new(2.0,2.0,0.0),R3.new(0.0,2.0,0.0)])
       s.shadow(f)
-      s.gaps.size.should == 2
+      expect(s.gaps.size).to be(2)
     end
 
   end
