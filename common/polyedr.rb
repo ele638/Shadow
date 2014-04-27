@@ -37,11 +37,11 @@ class R3
 
   # угол наклона вектора к плоскости Oxy (добавлено)
   def angle_with_xy
-	atan(@z/sqrt(@x**2+@y**2))<=::PI/7
+    atan(@z/sqrt(@x**2+@y**2))<=::PI/7
   end
   # длина проекции на горизонтальную плоскость (добавлено)
-  def proection
-    sqrt(@x**2+@y**2)
+  def proection(other)
+    sqrt((other.x-@x)**2+(other.y-@y)**2)
   end
 end
 
