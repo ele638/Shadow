@@ -30,8 +30,8 @@ class Edge
   SBEG = 0.0; SFIN = 1.0
   # начало и конец ребра (точки в R3), список "просветов"
   attr_reader :beg, :fin, :gaps
-  def initialize(b, f)
-    @beg, @fin, @gaps = b, f, [Segment.new(SBEG, SFIN)]
+  def initialize(b, f, coef)
+    @beg, @fin, @gaps, @coef = b, f, [Segment.new(SBEG, SFIN)], coef
   end  
   # учёт тени от одной грани
   def shadow(facet)
@@ -53,16 +53,22 @@ class Edge
   def r3(t)
     @beg*(SFIN-t) + @fin*t
   end
-  def is_good?() #подходит ли нам это ребро (добавлено)
-    sum = @gaps.inject{|sum,x| sum+x.fin-x.beg}
+  
+  
+  def is_good?() #проверка частичной видимости (добавлено)
+	sum=0
+    @gaps.each{|x| sum=+x.fin-x.beg}
     sum > 0.000001 && sum < 0.999999
   end
-  def is_center_good?() #лежит ли в сфере (добавлено)
-    xc = (@beg.x + @fin.x) / 2.0
-	  yc = (@beg.y + @fin.y) / 2.0 
-	  zc = (@beg.z + @fin.z) / 2.0
+  
+  def is_center_good?() #лежит ли центр ребра в сфере (добавлено)
+    xc = (@beg.x + @fin.x) / (2.0*@coef)
+	yc = (@beg.y + @fin.y) / (2.0*@coef)
+	zc = (@beg.z + @fin.z) / (2.0*@coef)
     return ((xc**2+yc**2+zc**2)<4)
   end
+  
+  
   private
   # пересечение ребра с полупространством, задаваемым точкой (a)
   # на плоскости и вектором внешней нормали (n) к ней
@@ -107,14 +113,21 @@ end
 class Polyedr 
   # вектор проектирования
   V = R3.new(0.0,0.0,1.0)
-  def calculate_something() #считаем сумму проекций (добавлено)
+  
+  def magic() #считаем сумму проекций (добавлено)
     result = 0
-    edges.each do |e|
-      facets.each{|f| e.shadow(f)}
-      last=0.0
-      e.gaps.each{|s| result+=(e.r3(last)-e.r3(s.beg)).proection; last=s.fin}
-      result+=(e.r3(last)-e.r3(1.0)).proection
-    end
+	my_edges=edges.dup
+    my_edges.each{|e| facets.each{|f| e.shadow(f)}}
+	my_edges.uniq!
+	puts my_edges <=> edges
+	my_edges.each do |e|
+		if e.is_good?
+			puts "good"
+			last=0.0
+			e.gaps.each{|s| result+=e.r3(last).proection(e.r3(s.beg)); last=s.fin}
+			result+=e.r3(last).proection(e.r3(1.0))
+		end
+	end
     result
   end
 

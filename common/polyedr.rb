@@ -43,15 +43,25 @@ class R3
   def proection(other)
     sqrt((other.x-@x)**2+(other.y-@y)**2)
   end
+  
+  def eql?(other)
+	@x==other.x && @y==other.y && @z==other.z
+  end
 end
 
 # Ребро полиэдра
 class Edge 
   # начало и конец ребра (точки в R3)
-  attr_reader :beg, :fin
-  def initialize(b, f)
-    @beg, @fin = b, f
+  attr_reader :beg, :fin, :coef
+  def initialize(b, f, coef)
+    @beg, @fin, @coef = b, f, coef
   end  
+  def eql?(other)
+	@beg==other.beg && @fin==other.fin && @gaps==other.gaps
+  end
+  def hash
+	@beg.hash
+  end
 end
 
 # Грань полиэдра
@@ -92,7 +102,7 @@ class Polyedr
         # массив вершин очередной грани 
         vertexes = buf.map{|x| @vertexes[x.to_i - 1]}
         # задание рёбер очередной грани
-        (0...size).each{|n| @edges << Edge.new(vertexes[n-1],vertexes[n])}
+        (0...size).each{|n| @edges << Edge.new(vertexes[n-1],vertexes[n],c)}
         # задание очередной грани полиэдра
         @facets << Facet.new(vertexes)
       end
