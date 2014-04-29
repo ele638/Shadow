@@ -53,14 +53,14 @@ end
 class Edge 
   # начало и конец ребра (точки в R3)
   attr_reader :beg, :fin, :coef
-  def initialize(b, f, coef)
+  def initialize(b, f, coef=1.0)
     @beg, @fin, @coef = b, f, coef
   end  
   def eql?(other)
-	@beg==other.beg && @fin==other.fin && @gaps==other.gaps
+	(@beg==other.beg && @fin==other.fin) or (@beg==other.fin && @fin==other.beg) 
   end
   def hash
-	@beg.hash
+	@beg.hash + @fin.hash
   end
 end
 

@@ -96,6 +96,42 @@ describe Edge do
       s.shadow(f)
       expect(s.gaps.size).to be(2)
     end
-
   end
+  context "is_good?" do
+  
+    it "ребро с двумя просветами является частично видимым" do
+      s = Edge.new(R3.new(-5.0,-5.0,-1.0), R3.new(3.0,3.0,-1.0))
+      f=Facet.new([R3.new(0.0,0.0,0.0),R3.new(2.0,0.0,0.0),
+                   R3.new(2.0,2.0,0.0),R3.new(0.0,2.0,0.0)])
+      s.shadow(f)
+      expect(s.is_good?).to be_true
+    end
+    
+    it "полностью невидимое ребро не является частично видимым" do
+      s = Edge.new(R3.new(0.0,0.0,-1.0), R3.new(1.0,1.0,-1.0))
+      f=Facet.new([R3.new(0.0,0.0,0.0),R3.new(2.0,0.0,0.0),
+                   R3.new(2.0,2.0,0.0),R3.new(0.0,2.0,0.0)])
+      s.shadow(f)
+      expect(s.is_good?).to be_false
+    end
+    
+    it "полностью видимое ребро не является частично видимым" do
+      s = Edge.new(R3.new(0.0,0.0,0.0), R3.new(1.0,1.0,0.0))
+      f=Facet.new([R3.new(0.0,0.0,0.0),R3.new(2.0,0.0,0.0),
+                   R3.new(2.0,2.0,0.0),R3.new(0.0,2.0,0.0)])
+      s.shadow(f)
+      expect(s.is_good?).to be_false
+    end
+    
+  end
+  
+  context "is_center_good?" do
+    
+    it "ребро с координатами (0,0,-1) (1,1,-1)" do
+      s = Edge.new(R3.new(0.0,0.0,-1.0), R3.new(1.0,1.0,-1.0))
+      expect(s.is_center_good?).to be_true
+    end
+    
+  end
+  
 end
