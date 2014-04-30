@@ -98,13 +98,12 @@ end
 class Polyedr 
   # вектор проектирования
   V = R3.new(0.0,0.0,1.0)
+
   def draw
     TkDrawer.clean
     edges.each do |e|
       facets.each{|f| e.shadow(f)}
-      last=0.0
-      e.gaps.each{|s| (TkDrawer.draw_line_invisible(e.r3(last), e.r3(s.beg)); last=s.fin; TkDrawer.draw_line(e.r3(s.beg), e.r3(s.fin)))}
-      TkDrawer.draw_line_invisible(e.r3(last), e.r3(1.0))
+      e.gaps.each{|s| TkDrawer.draw_line(e.r3(s.beg), e.r3(s.fin))}
     end
   end
 end
