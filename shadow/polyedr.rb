@@ -87,6 +87,13 @@ class Facet
     end
   end
 
+  def is_invisible? #проверка невидимости всех ребер грани (добавлено)
+    edges.each do |e|
+      return false if e.gaps.size!=0
+    end
+    true
+  end
+
   private
   # центр грани
   def center
@@ -98,6 +105,19 @@ end
 class Polyedr 
   # вектор проектирования
   V = R3.new(0.0,0.0,1.0)
+
+  def func
+    sum=0
+    facets.each do |f|
+      if f.is_invisible? && f.proverka_dubinina
+        f.edges.each do |e|
+          sum+=e.metod_dubinia_summi
+        end
+      end
+    end
+    sum
+  end
+
   def draw
     TkDrawer.clean
     edges.each do |e|

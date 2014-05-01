@@ -13,7 +13,7 @@ module TkDrawer
   def TkDrawer.draw_line(p,q)
     TkcLine.new(CANVAS, x(p), y(p), x(q), y(q)) {fill('black')}    
   end
-
+  #рисование невидимых линий (добавлено)
   def TkDrawer.draw_line_invisible(p,q,color='grey')
     TkcLine.new(CANVAS, x(p), y(p), x(q), y(q)) {fill(color);dash('_')}  
   end
