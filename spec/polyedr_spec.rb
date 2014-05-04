@@ -4,7 +4,7 @@ EPS = 1.0e-1
 describe "Figures" do 
   it "test_1" do
     a = Polyedr.new("../data/test1.geom")
-    a.magic.round(1).should be_within(EPS).of(717.3)
+    a.magic.round(1).should be_within(EPS).of(206.2)
   end
    
  it "test_2" do
