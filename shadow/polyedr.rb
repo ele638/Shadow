@@ -127,8 +127,6 @@ class Polyedr
 	end
     result
   end
-  
-  end
   def draw
     TkDrawer.clean
     edges.each do |e|
@@ -139,3 +137,4 @@ class Polyedr
       TkDrawer.draw_line_invisible(e.r3(last), e.r3(1.0))
     end
   end
+end

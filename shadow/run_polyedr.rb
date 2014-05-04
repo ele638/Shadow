@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+﻿#!/usr/bin/env ruby
 require './polyedr'
 require '../common/tk_drawer'
 TkDrawer.create

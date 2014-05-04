@@ -1,4 +1,4 @@
-require 'rspec'
+﻿require 'rspec'
 require_relative '../shadow/polyedr'
 require_relative 'support/matchers/to_be_close.rb'
 
@@ -97,6 +97,7 @@ describe Edge do
       expect(s.gaps.size).to be(2)
     end
   end
+  
   context "is_good?" do
   
     it "ребро с двумя просветами является частично видимым" do
@@ -127,11 +128,20 @@ describe Edge do
   
   context "is_center_good?" do
     
-    it "ребро с координатами (0,0,-1) (1,1,-1)" do
+    it "ребро с координатами (0,0,-1) (1,1,-1) имеет центр внутри сферы радиуса 2" do
       s = Edge.new(R3.new(0.0,0.0,-1.0), R3.new(1.0,1.0,-1.0))
       expect(s.is_center_good?).to be_true
     end
     
+    it "ребро с координатами (-10,-10,-1) (10,10,-1) имеет центр внутри сферы радиуса 2" do
+      s = Edge.new(R3.new(-10.0,-10.0,-1.0), R3.new(10.0,10.0,-1.0))
+      expect(s.is_center_good?).to be_true
+    end
+
+    it "ребро с координатами (0,0,-1) (10,10,-1) имеет центр вне сферы радиуса 2 " do
+      s = Edge.new(R3.new(0.0,0.0,-1.0),  R3.new(10.0,10.0,-1.0))
+      expect(s.is_center_good?).to be_false
+    end
   end
   
 end
