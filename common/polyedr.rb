@@ -61,7 +61,7 @@ end
 class Facet 
   # массив вершин
   attr_reader :vertexes, :edges
-  def initialize(vertexes, edges, coef) #грань теперь задается 3я параметрами: вершины, грани ее образующие, коэффициент гомотетии(для удобства рассчетов) (обновлено)
+  def initialize(vertexes, edges=[], coef=1.0) #грань теперь задается 3я параметрами: вершины, грани ее образующие, коэффициент гомотетии(для удобства рассчетов) (обновлено)
     @vertexes = vertexes
 	@edges = edges
 	@coef=coef
@@ -99,7 +99,7 @@ class Polyedr
         vertexes = buf.map{|x| @vertexes[x.to_i - 1]}
         # задание рёбер очередной грани
         (0...size).each{|n| @edges << Edge.new(vertexes[n-1],vertexes[n])} #заполняем массив всех ребер
-		(0...size).each{|n| array_of_edges << Edge.new(vertexes[n-1],vertexes[n])} #заполняем массив ребер текущей грани (добавлено)
+		    (0...size).each{|n| array_of_edges << Edge.new(vertexes[n-1],vertexes[n])} #заполняем массив ребер текущей грани (добавлено)
         # задание очередной грани полиэдра
         @facets << Facet.new(vertexes, array_of_edges,c) #создаем новую грань (обновлено)
       end
