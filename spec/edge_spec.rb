@@ -1,4 +1,4 @@
-require 'rspec'
+﻿require 'rspec'
 require_relative '../shadow/polyedr'
 require_relative 'support/matchers/to_be_close.rb'
 

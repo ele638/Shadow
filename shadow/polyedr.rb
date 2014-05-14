@@ -30,8 +30,8 @@ class Edge
   SBEG = 0.0; SFIN = 1.0
   # начало и конец ребра (точки в R3), список "просветов"
   attr_reader :beg, :fin, :gaps
-  def initialize(b, f)
-    @beg, @fin, @gaps = b, f, [Segment.new(SBEG, SFIN)]
+  def initialize(b, f, coef=1.0)
+    @beg, @fin, @gaps, @coef = b, f, [Segment.new(SBEG, SFIN)], coef
   end  
   # учёт тени от одной грани
   def shadow(facet)
@@ -54,6 +54,44 @@ class Edge
     @beg*(SFIN-t) + @fin*t
   end
 
+  def is_center_good? #метод вычисления середины ребра (добавлено)
+    xcenter=(@beg.x+@fin.x)/(2*@coef)
+    ycenter=(@beg.y+@fin.y)/(2*@coef)
+    zcenter=(@beg.z+@fin.z)/(2*@coef)
+    if xcenter**2+ycenter**2+zcenter**2>=4
+      return false
+    else
+      return true
+    end
+=begin
+  Гугли "как найти середину вектора, это линал, было в первом семестре, мне влом по-новой объяснять базу"
+  Затем, получив координаты точек середины ребра, подставляем их в уравнение сферы и проверяем, лежит ли центр в сфере
+=end
+  end
+  def is_visible?
+    if @gaps.size==1 && @gaps[0].beg==0.0 && @gaps[0].fin==1.0
+      return true
+    else
+      return false
+    end
+=begin
+  если количество просветов равно одному, начало равно началу отрезка, а конец - концу отрезка, то это озночает, что ребро 
+  полностью видимо. Если хоть что-то не выполняется, то это уже не полностью видимое ребро
+=end
+  end
+  def is_good?
+    return false if @beg.angle(@fin)>10 #если угол больше 10и градусов, то ребро нам не подходит
+    return false if self.is_center_good? #если центр не подходит
+    return false if !self.is_visible? #если неполностью видимо
+    return true
+  end
+
+  def sum
+    return Math.sqrt((@fin.x-@beg.x)**2+(@fin.y-@beg.y)**2+(@fin.z-@beg.z)**2)
+  end
+=begin
+  Метод получения длины ребра
+=end
   private
   # пересечение ребра с полупространством, задаваемым точкой (a)
   # на плоскости и вектором внешней нормали (n) к ней
@@ -105,5 +143,16 @@ class Polyedr
       facets.each{|f| e.shadow(f)}
       e.gaps.each{|s| TkDrawer.draw_line(e.r3(s.beg), e.r3(s.fin))}
     end
+  end
+
+  def func
+    sum=0
+    edges.each do |e| #идем по всем ребрам
+      facets.each{|f| e.shadow(f)} #каждое ребро затеняем всеми гранями
+      if e.is_good? #если ребро хорошее, то прибавляем длину
+        sum+=e.sum
+      end
+    end
+    return sum
   end
 end

@@ -34,15 +34,29 @@ class R3
   def cross(other)
     R3.new(@y*other.z-@z*other.y, @z*other.x-@x*other.z, @x*other.y-@y*other.x)
   end
+
+  def angle(other) #метод определения угла (добавлено)
+    return asin(sqrt((other.x-@x)**2+(other.y-@y)**2)/sqrt((other.x-@x)**2+(other.y-@y)**2+(other.z-@z)**2))*180/::PI
+=begin
+  (other.x-@x) - из координат конца вычитаем координаты начала
+  sqrt((other.x-@x)**2+(other.y-@y)**2) - длина проекции на горизонтальную плоскость, она же Оху (если не понял, почему так, гугли "модуль\длина вектора")
+  sqrt((other.x-@x)**2+(other.y-@y)**2+(other.z-@z)**2) - длина всего вектора (принцип тот же)
+  sqrt((other.x-@x)**2+(other.y-@y)**2)/sqrt((other.x-@x)**2+(other.y-@y)**2+(other.z-@z)**2) - отношение противолежащего 
+  катета(длина проекции вектора на плоскость Оху) к гипотенузе (длина вектора) есть синус искомого угла
+  asin()*180/::PI - вычисление арксинуса угла. Так как от метода asim возвращается значение в радианах(в PI), то умножаем на 180 и 
+  делим на PI. К примеру, (PI/4)*(180/PI) = 45
+=end
+  end
 end
 
 # Ребро полиэдра
 class Edge 
   # начало и конец ребра (точки в R3)
   attr_reader :beg, :fin
-  def initialize(b, f)
-    @beg, @fin = b, f
-  end  
+  def initialize(b, f, coef=1.0) #добавил коэффициент гомотетии в класс (добавлено)
+    @beg, @fin, @coef = b, f, coef
+  end 
+
 end
 
 # Грань полиэдра
@@ -83,7 +97,7 @@ class Polyedr
         # массив вершин очередной грани 
         vertexes = buf.map{|x| @vertexes[x.to_i - 1]}
         # задание рёбер очередной грани
-        (0...size).each{|n| @edges << Edge.new(vertexes[n-1],vertexes[n])}
+        (0...size).each{|n| @edges << Edge.new(vertexes[n-1],vertexes[n],c)} #изменил инициализацию ребер (добавлено)
         # задание очередной грани полиэдра
         @facets << Facet.new(vertexes)
       end
