@@ -30,8 +30,8 @@ class Edge
   SBEG = 0.0; SFIN = 1.0
   # начало и конец ребра (точки в R3), список "просветов"
   attr_reader :beg, :fin, :gaps
-  def initialize(b, f)
-    @beg, @fin, @gaps = b, f, [Segment.new(SBEG, SFIN)]
+  def initialize(b, f, c=1.0) #(обновлено)
+    @beg, @fin, @gaps, @coef = b, f, [Segment.new(SBEG, SFIN)], c #(обновлено)
   end  
   # учёт тени от одной грани
   def shadow(facet)
@@ -52,6 +52,22 @@ class Edge
   # преобразование одномерных координат в трёхмерные
   def r3(t)
     @beg*(SFIN-t) + @fin*t
+  end
+
+  def visible? #(добавлено)
+    @gaps.size==1 && @gaps[0].beg==0.0 && @gaps[0].fin==1.0
+  end
+
+  def center_good? #(добавлено)
+    (2.0-((@beg.x+@fin.x)/(2.0*@coef) )).abs < 1.0
+  end
+
+  def center_good #(добавлено)
+    (2-(@beg.x+@fin.x)/(2.0*@coef)).abs
+  end
+
+  def proection #(добавлено)
+    Math.sqrt((@fin.x-@beg.x)**2+(@fin.y-@beg.y)**2)/@coef
   end
 
   private
@@ -98,6 +114,15 @@ end
 class Polyedr 
   # вектор проектирования
   V = R3.new(0.0,0.0,1.0)
+
+  def func #(добавлено)
+    sum=0
+    edges.each do |e|
+      facets.each{|f| e.shadow(f)}
+      sum+= e.proection if e.visible? && e.center_good?
+    end
+    sum
+  end
 
   def draw
     TkDrawer.clean

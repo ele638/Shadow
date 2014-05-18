@@ -40,8 +40,8 @@ end
 class Edge 
   # начало и конец ребра (точки в R3)
   attr_reader :beg, :fin
-  def initialize(b, f)
-    @beg, @fin = b, f
+  def initialize(b, f, c=1.0) # (обновлено)
+    @beg, @fin, @@coef = b, f, c # (обновлено)
   end  
 end
 
@@ -83,7 +83,7 @@ class Polyedr
         # массив вершин очередной грани 
         vertexes = buf.map{|x| @vertexes[x.to_i - 1]}
         # задание рёбер очередной грани
-        (0...size).each{|n| @edges << Edge.new(vertexes[n-1],vertexes[n])}
+        (0...size).each{|n| @edges << Edge.new(vertexes[n-1],vertexes[n],c)} #(обновлено)
         # задание очередной грани полиэдра
         @facets << Facet.new(vertexes)
       end
