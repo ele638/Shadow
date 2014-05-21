@@ -29,9 +29,9 @@ class Edge
   # Начало и конец стандартного одномерного отрезка
   SBEG = 0.0; SFIN = 1.0
   # начало и конец ребра (точки в R3), список "просветов"
-  attr_reader :beg, :fin, :gaps
-  def initialize(b, f)
-    @beg, @fin, @gaps = b, f, [Segment.new(SBEG, SFIN)]
+  attr_reader :beg, :fin, :gaps, :coef
+  def initialize(b, f, c=1.0) #класс Edge теперь запоминает коэффициент гомотетии (обновлено)
+    @beg, @fin, @gaps, @coef = b, f, [Segment.new(SBEG, SFIN)], c
   end  
   # учёт тени от одной грани
   def shadow(facet)
@@ -52,6 +52,18 @@ class Edge
   # преобразование одномерных координат в трёхмерные
   def r3(t)
     @beg*(SFIN-t) + @fin*t
+  end
+
+  def center #возвращает объект R3, точку, с координатами середины ребра (добавлено)
+    xc=(@fin.x+@beg.x)/2.0 #алгебра, нахождение середины отрезка
+    yc=(@fin.y+@beg.y)/2.0
+    zc=(@fin.z+@beg.z)/2.0
+    return R3.new(xc,yc,zc)
+  end
+
+  def length #возвращает длину ребра (добавлено)
+    return Math.sqrt(((@fin.x-@beg.x)**2+(@fin.y-@beg.y)**2+(@fin.z-@beg.z)**2))/@coef #алгебра, нахождение модуля вектора в пространстве
+    #дополнительно делим на коэффициент гомотетии
   end
 
   private
@@ -98,6 +110,22 @@ end
 class Polyedr 
   # вектор проектирования
   V = R3.new(0.0,0.0,1.0)
+
+  def func #финальный метод подсчета (добавлено)
+    sum=0
+    edges.each do |e|
+      if e.center.is_point_good?(e.coef) && (e.beg.is_point_good?(e.coef) ^ e.fin.is_point_good?(e.coef))
+=begin 
+^ - это оператор xor, работает по принципу:
+true ^ false == true
+false ^ false == false
+true ^ true == false
+=end
+        sum += e.length
+      end
+    end
+    return sum
+  end
 
   def draw
     TkDrawer.clean

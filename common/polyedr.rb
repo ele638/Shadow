@@ -34,14 +34,22 @@ class R3
   def cross(other)
     R3.new(@y*other.z-@z*other.y, @z*other.x-@x*other.z, @x*other.y-@y*other.x)
   end
+
+  def is_point_good?(coef=1.0) #проверка точки на "хорошесть" (добалвено)
+    if (2.0 - (@x/coef)).abs < 1.0 #если расстояние до прямой x=2 строго меньше 1, то вернется true, иначе false
+      return true
+    else
+      return false
+    end 
+  end
 end
 
 # Ребро полиэдра
 class Edge 
   # начало и конец ребра (точки в R3)
   attr_reader :beg, :fin
-  def initialize(b, f)
-    @beg, @fin = b, f
+  def initialize(b, f, c=1.0) #класс Edge теперь запоминает коэффициент гомотетии (обновлено)
+    @beg, @fin, @coef = b, f, c 
   end  
 end
 
@@ -83,7 +91,7 @@ class Polyedr
         # массив вершин очередной грани 
         vertexes = buf.map{|x| @vertexes[x.to_i - 1]}
         # задание рёбер очередной грани
-        (0...size).each{|n| @edges << Edge.new(vertexes[n-1],vertexes[n])}
+        (0...size).each{|n| @edges << Edge.new(vertexes[n-1],vertexes[n],c)} #обновлена инициализация ребер (обновлено)
         # задание очередной грани полиэдра
         @facets << Facet.new(vertexes)
       end
