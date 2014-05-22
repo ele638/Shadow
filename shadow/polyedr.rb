@@ -57,8 +57,7 @@ class Edge
   def is_center_good? #метод вычисления середины ребра (добавлено)
     xcenter=(@beg.x+@fin.x)/(2*@coef)
     ycenter=(@beg.y+@fin.y)/(2*@coef)
-    zcenter=(@beg.z+@fin.z)/(2*@coef)
-    if xcenter**2+ycenter**2+zcenter**2>=4
+    if xcenter**2+ycenter**2>=4
       return false
     else
       return true
@@ -87,7 +86,7 @@ class Edge
   end
 
   def sum
-    return Math.sqrt((@fin.x-@beg.x)**2+(@fin.y-@beg.y)**2+(@fin.z-@beg.z)**2)
+    return Math.sqrt((@fin.x-@beg.x)**2+(@fin.y-@beg.y)**2)
   end
 =begin
   Метод получения длины ребра

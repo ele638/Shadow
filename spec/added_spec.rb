@@ -67,7 +67,7 @@ describe "Класс Edge: " do
 			expect(s.sum).to eq 5.0
 		end
 
-		it "длина вектора {0,0,0} равна 5" do
+		it "длина вектора {0,0,0} равна 0" do
 			s = Edge.new(R3.new(0.0,-1.0,0.0), R3.new(0.0,-1.0,0.0))
 			expect(s.sum).to eq(0.0)
 		end
@@ -77,9 +77,9 @@ describe "Класс Edge: " do
 			expect(s.sum).to be_close_to(Math.sqrt(50))
 		end
 
-		it "длина вектора {20,0,15} равна 5" do
+		it "длина вектора {20,0,15} равна 20" do
 			s = Edge.new(R3.new(-10.0,-1.0,0.0), R3.new(10.0,-1.0,15.0))
-			expect(s.sum).to eq(25.0)
+			expect(s.sum).to eq(20.0)
 		end
 	end
 end
