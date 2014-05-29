@@ -49,7 +49,7 @@ end
 class Facet 
   # массив вершин
   attr_reader :vertexes
-  def initialize(vertexes, edges) #объект класса Facet теперь помнит ребра, которыми он задан (обновлено)
+  def initialize(vertexes, edges=[]) #объект класса Facet теперь помнит ребра, которыми он задан (обновлено)
     @edges = edges
     @vertexes = vertexes
   end

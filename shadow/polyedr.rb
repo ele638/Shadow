@@ -54,8 +54,8 @@ class Edge
     @beg*(SFIN-t) + @fin*t
   end
 
-  def length #метод вычисления длины ребра (добавлено)
-    return Math.sqrt( (@fin-@beg)**2 + (@fin-@beg)**2 )
+  def length #метод вычисления длины проекции ребра (добавлено)
+    return Math.sqrt( (@fin.x-@beg.x)**2 + (@fin.y-@beg.y)**2 )
   end
 
   def is_visible? #метод проверки на частичную видимость (добавлено)
