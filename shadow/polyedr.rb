@@ -54,6 +54,16 @@ class Edge
     @beg*(SFIN-t) + @fin*t
   end
 
+  def length #метод вычисления длины ребра (добавлено)
+    return Math.sqrt( (@fin-@beg)**2 + (@fin-@beg)**2 )
+  end
+
+  def is_visible? #метод проверки на частичную видимость (добавлено)
+    return false if @gaps.size==0 #если невидимое
+    return false if @gaps.size==1 and @gaps[0].beg==SBEG and @gaps[0].fin==SFIN #если полностью видимое
+    return true
+  end
+
   private
   # пересечение ребра с полупространством, задаваемым точкой (a)
   # на плоскости и вектором внешней нормали (n) к ней
@@ -87,7 +97,18 @@ class Facet
     end
   end
 
-  private
+  def perimetr #метод вычисления периметра (добавлено)
+    per=0
+    @edges.each{|e| per+=e.length }
+    return per
+  end
+
+  def is_good? #метод проверки грани на центр и частичную видимость
+    return false if self.center.x<=1 and self.center.x>=-1 and self.center.y<=1 and self.center.y>=-1
+    @edges.each{|e| return false if !e.is_visible?}
+    return true
+  end
+
   # центр грани
   def center
     @vertexes.inject(R3.new(0.0,0.0,0.0)){|s,v| s+v}*(1.0/@vertexes.size)
@@ -98,6 +119,15 @@ end
 class Polyedr 
   # вектор проектирования
   V = R3.new(0.0,0.0,1.0)
+
+  def func
+    sum=0
+    edges.each do |e|
+      facets.each{|f| e.shadow(f)}
+    end
+    facets.each{|f| sum+=f.perimetr if f.is_good? }
+    return sum
+  end
 
   def draw
     TkDrawer.clean

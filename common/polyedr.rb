@@ -49,7 +49,8 @@ end
 class Facet 
   # массив вершин
   attr_reader :vertexes
-  def initialize(vertexes)
+  def initialize(vertexes, edges) #объект класса Facet теперь помнит ребра, которыми он задан (обновлено)
+    @edges = edges
     @vertexes = vertexes
   end
 end
@@ -76,6 +77,7 @@ class Polyedr
         @vertexes << R3.new(x,y,z).rz(alpha).ry(beta).rz(gamma)*c
       end
       nf.times do
+        array=[] #вспомогательный массив ребер конкретной грани (добавлено)
         # вспомогательный массив
         buf = f.readline.split
         # количество вершин
@@ -84,8 +86,9 @@ class Polyedr
         vertexes = buf.map{|x| @vertexes[x.to_i - 1]}
         # задание рёбер очередной грани
         (0...size).each{|n| @edges << Edge.new(vertexes[n-1],vertexes[n])}
+        (0...size).each{|n| array << Edge.new(vertexes[n-1],vertexes[n])} #запоминаем ребра грани (добавлено)
         # задание очередной грани полиэдра
-        @facets << Facet.new(vertexes)
+        @facets << Facet.new(vertexes, array) #меняем инициализацию грани (добавлено)
       end
     end
   end
