@@ -120,20 +120,18 @@ class Polyedr
   # вектор проектирования
   V = R3.new(0.0,0.0,1.0)
 
-  def func
-    sum=0
-    edges.each do |e|
-      facets.each{|f| e.shadow(f)}
-    end
-    facets.each{|f| sum+=f.perimetr if f.is_good? }
-    return sum
+  def func(f)
+    return f.is_good? ? f.perimetr : 0.0
   end
 
   def draw
+    sum=0
     TkDrawer.clean
     edges.each do |e|
       facets.each{|f| e.shadow(f)}
+      sum+=func(f)
       e.gaps.each{|s| TkDrawer.draw_line(e.r3(s.beg), e.r3(s.fin))}
     end
+    return sum
   end
 end
